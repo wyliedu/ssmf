@@ -11,6 +11,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,9 +23,24 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
+import com.wylie.entity.UserEntity;
+import com.wylie.enums.UserSexEnum;
+import com.wylie.mapper.UserMapper;
+import com.wylie.services.UserService;
+
+
 @Controller
-public class ThymeleafController{
+public class ThymeleafController extends BasePageController{
 	
+    @Autowired
+    private UserService userService;
+    
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+    
+	@Autowired
+	private RedisTemplate redisTemplate;
+    
     @RequestMapping("/login")
 	public String login(Model model) throws InterruptedException {
     	model.addAttribute("greeting", "login");
@@ -56,13 +75,26 @@ public class ThymeleafController{
     
     @RequestMapping("/")
 	public String hel(Locale locale, Model model) throws InterruptedException {
-		model.addAttribute("greeting", "hi");
+		model.addAttribute("greeting", "hi"+userService.getPort());
 		return "index";
 	}
     
     @RequestMapping("/index")
 	public String hello(Locale locale, Model model) throws InterruptedException {
 		model.addAttribute("greeting", "hi");
+		stringRedisTemplate.opsForValue().set("aaa", "111");
+
+        String a = stringRedisTemplate.opsForValue().get("aaa");
+        UserEntity user=new UserEntity("aa@126.com", "aa", UserSexEnum.MAN);
+        ValueOperations<String, UserEntity> operations=redisTemplate.opsForValue();
+        operations.set("com.neox", user);
+        operations.set("com.neo.f", user,1,TimeUnit.SECONDS);
+        Thread.sleep(1000);
+        //redisTemplate.delete("com.neo.f");
+        boolean exists2=redisTemplate.hasKey("com.neox");
+        boolean exists=redisTemplate.hasKey("com.neo.f");
+        List<UserEntity> list2 = (List<UserEntity>) redisTemplate.opsForValue().get("allUser");
+        String b = operations.get("com.neox").getUserName();
 		return "index";
 	}
 

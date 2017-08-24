@@ -23,8 +23,10 @@ import com.wylie.common.dto.CommonData;
 import com.wylie.entity.UserEntity;
 import com.wylie.exception.NotFoundException;
 import com.wylie.mapper.UserMapper;
+import com.wylie.message.rabbit.hello.HelloSender;
+import com.wylie.message.rabbit.many.NeoSender;
+import com.wylie.message.rabbit.many.NeoSender2;
 import com.wylie.models.InChangePassword;
-
 
 @RestController
 @RequestMapping("/api")
@@ -35,6 +37,14 @@ public class UserController extends BaseController{
     @Autowired
     private UserMapper user1Mapper;
 	
+	@Autowired
+	private HelloSender helloSender;
+	
+	@Autowired
+	private NeoSender neoSender;
+	
+	@Autowired
+	private NeoSender2 neoSender2;
 	
 	@RequestMapping(value ="/getUsers", method = RequestMethod.GET)
 	public ResponseEntity<CommonData<Object>> getUsers(@CookieValue(required = false) final String locale) {
@@ -65,4 +75,17 @@ public class UserController extends BaseController{
         user1Mapper.delete(id);
     }
     
+	@RequestMapping(value ="/testMQ", method = RequestMethod.GET)
+	public void testMQ() {
+		for (int i=0;i<10;i++){
+			this.helloSender.send();
+		}
+		for (int i=0;i<10;i++){
+			neoSender.send(i);
+		}
+		for (int i=0;i<10;i++){
+			neoSender.send(i);
+			neoSender2.send(i);
+		}
+	}
 }

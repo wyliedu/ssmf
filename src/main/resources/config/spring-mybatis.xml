@@ -75,6 +75,8 @@
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
+	<!-- 添加对@Transactional注解进行的驱动支持 -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
 	
 	<tx:advice id="txAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
@@ -127,6 +129,9 @@
 	
 	<!-- 引入rabbitmq的配置 -->
 	<import resource="classpath:config/spring-mq.xml" />
+	
+	<!-- 引入solr的配置 -->
+	<import resource="classpath:config/spring-solr.xml" />
 	
 	<!-- 开发环境配置文件 -->
 	<beans profile="dev">

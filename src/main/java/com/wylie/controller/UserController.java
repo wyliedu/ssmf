@@ -1,7 +1,9 @@
 package com.wylie.controller;
 
+import java.io.IOException;
 import java.util.List;
 
+import org.apache.solr.client.solrj.SolrServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,7 @@ import com.wylie.message.rabbit.hello.HelloSender;
 import com.wylie.message.rabbit.many.NeoSender;
 import com.wylie.message.rabbit.many.NeoSender2;
 import com.wylie.models.InChangePassword;
+import com.wylie.services.UserService;
 
 @RestController
 @RequestMapping("/api")
@@ -45,6 +48,9 @@ public class UserController extends BaseController{
 	
 	@Autowired
 	private NeoSender2 neoSender2;
+	
+    @Autowired
+    private UserService userService;
 	
 	@RequestMapping(value ="/getUsers", method = RequestMethod.GET)
 	public ResponseEntity<CommonData<Object>> getUsers(@CookieValue(required = false) final String locale) {
@@ -87,5 +93,10 @@ public class UserController extends BaseController{
 			neoSender.send(i);
 			neoSender2.send(i);
 		}
+	}
+	
+	@RequestMapping(value ="/testSolr", method = RequestMethod.GET)
+	public void testSolr() throws SolrServerException, IOException {
+		this.userService.testSolr();
 	}
 }
